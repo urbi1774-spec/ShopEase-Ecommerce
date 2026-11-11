@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#ede9fe"/>
+    </linearGradient>
+    <linearGradient id="packBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="packPocket" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4c1d95"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <filter id="shadow4" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#0f172a" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <rect width="600" height="600" rx="32" fill="url(#bg4)"/>
+  <circle cx="460" cy="140" r="105" fill="#ddd6fe" opacity="0.5"/>
+  <g filter="url(#shadow4)">
+    <!-- Top Handle -->
+    <path d="M 260 145 Q 300 105 340 145" fill="none" stroke="#334155" stroke-width="16" stroke-linecap="round"/>
+    <!-- Main Pack Body -->
+    <rect x="175" y="140" width="250" height="330" rx="48" fill="url(#packBody)"/>
+    <!-- Upper Tech Panel -->
+    <path d="M 195 190 Q 300 220 405 190 L 405 265 Q 300 285 195 265 Z" fill="#334155"/>
+    <!-- Front Compartment -->
+    <rect x="200" y="285" width="200" height="155" rx="28" fill="url(#packPocket)"/>
+    <!-- Waterproof Zipper Line -->
+    <line x1="215" y1="315" x2="385" y2="315" stroke="#a78bfa" stroke-width="4" stroke-linecap="round"/>
+    <rect x="355" y="308" width="14" height="22" rx="4" fill="#c4b5fd"/>
+    <!-- Brand Badge -->
+    <rect x="265" y="212" width="70" height="26" rx="6" fill="#6d28d9"/>
+    <text x="300" y="229" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="1.5">NOMAD</text>
+  </g>
+  <text x="300" y="545" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="700" fill="#4338ca" text-anchor="middle" letter-spacing="2">NOMAD PRO 24L PACK</text>
+</svg>

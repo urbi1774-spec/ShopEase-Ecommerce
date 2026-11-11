@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% block title %}{{ product['name'] }} — ShopEase{% endblock %}
+
+{% block content %}
+<section class="page-banner" style="padding:1.5rem 0;">
+    <div class="container">
+        <div class="breadcrumb" style="margin-bottom:0;">
+            <a href="{{ url_for('index') }}">Home</a>
+            <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i>
+            <a href="{{ url_for('shop') }}">Shop</a>
+            <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i>
+            <a href="{{ url_for('shop', category=product['category_slug']) }}">{{ product['category_name'] }}</a>
+            <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i>
+            <span style="color:var(--text-main);font-weight:600;">{{ product['name'] }}</span>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="product-detail-grid">
+        <!-- Large Product Image Gallery Card -->
+        <div class="product-gallery-card">
+            <div class="product-badges" style="top:1.5rem;left:1.5rem;">
+                {% if product['discount_price'] and product['discount_price'] < product['price'] %}
+                    {% set pct = (((product['price'] - product['discount_price']) / product['price']) * 100) | round | int %}
+                    <span class="badge badge-sale" style="font-size:0.85rem;padding:0.4rem 0.9rem;">SAVE {{ pct }}%</span>
+                {% endif %}
+                {% if product['is_featured'] %}
+                    <span class="badge badge-purple">Featured</span>
+                {% endif %}
+            </div>
+            <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
+        </div>
+
+        <!-- Product Details & Purchase Box -->
+        <div class="product-info-panel">
+            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+                <a href="{{ url_for('shop', category=product['category_slug']) }}" class="badge badge-purple">
+                    {{ product['category_name'] }}
+                </a>
+                <span style="font-size:0.85rem;color:var(--text-muted);">
+                    Brand: <strong style="color:var(--text-main);">{{ product['brand'] }}</strong>
+                </span>
+                <span style="font-size:0.85rem;color:var(--text-muted);">
+                    SKU: <code>{{ product['sku'] }}</code>
+                </span>
+            </div>
+
+            <h1>{{ product['name'] }}</h1>
+
+            <!-- Rating & Stock Row -->
+            <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;margin-bottom:1rem;">
+                <div style="display:flex;align-items:center;gap:0.35rem;color:#f59e0b;font-weight:700;">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star-half-stroke"></i>
+                    <span style="color:var(--text-main);margin-left:4px;">{{ product['rating'] }}</span>
+                    <span style="color:var(--text-muted);font-weight:500;">({{ product['reviews_count'] }} verified reviews)</span>
+                </div>
+
+                {% if product['stock'] > 10 %}
+                    <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> In Stock ({{ product['stock'] }} available)</span>
+                {% elif product['stock'] > 0 %}
+                    <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> Low Stock (Only {{ product['stock'] }} left!)</span>
+                {% else %}
+                    <span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> Out of Stock</span>
+                {% endif %}
+            </div>
+
+            <!-- Price & Discount Box -->
+            <div class="detail-price-box">
+                {% if product['discount_price'] and product['discount_price'] < product['price'] %}
+                    <span class="detail-price-current">${{ "%.2f"|format(product['discount_price']) }}</span>
+                    <span class="detail-price-old">${{ "%.2f"|format(product['price']) }}</span>
+                    <span class="badge badge-sale">
+                        You Save ${{ "%.2f"|format(product['price'] - product['discount_price']) }}
+                    </span>
+                {% else %}
+                    <span class="detail-price-current">${{ "%.2f"|format(product['price']) }}</span>
+                {% endif %}
+            </div>
+
+            <p style="font-size:1rem;color:var(--text-secondary);line-height:1.75;margin-bottom:1.75rem;">
+                {{ product['description'] }}
+            </p>
+
+            <!-- Quantity Selector & Add to Cart Form -->
+            {% if product['stock'] > 0 %}
+            <form action="{{ url_for('add_to_cart') }}" method="POST" class="js-add-to-cart-form" style="margin-bottom:2rem;">
+                <input type="hidden" name="product_id" value="{{ product['id'] }}">
+                <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                    <div class="qty-selector" data-qty-control>
+                        <button type="button" class="qty-btn" data-qty-dec aria-label="Decrease quantity">&minus;</button>
+                        <input type="number" name="quantity" value="1" min="1" max="{{ product['stock'] }}" class="qty-input" aria-label="Quantity">
+                        <button type="button" class="qty-btn" data-qty-inc aria-label="Increase quantity">&plus;</button>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg" style="flex:1;min-width:220px;">
+                        <i class="fa-solid fa-cart-plus"></i> Add to Shopping Cart
+                    </button>
+                </div>
+            </form>
+            {% else %}
+            <div style="margin-bottom:2rem;">
+                <button type="button" class="btn btn-outline btn-lg btn-block" disabled>
+                    <i class="fa-solid fa-ban"></i> Currently Out of Stock
+                </button>
+            </div>
+            {% endif %}
+
+            <!-- Value Highlights -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;padding-top:1.5rem;border-top:1px solid var(--border-color);">
+                <div style="display:flex;align-items:center;gap:0.65rem;font-size:0.88rem;color:var(--text-secondary);">
+                    <i class="fa-solid fa-money-bill-wave" style="color:var(--purple-600);font-size:1.1rem;"></i>
+                    <span>Cash on Delivery Supported</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.65rem;font-size:0.88rem;color:var(--text-secondary);">
+                    <i class="fa-solid fa-truck-fast" style="color:var(--blue-600);font-size:1.1rem;"></i>
+                    <span>Fast Dispatch in 24 Hours</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.65rem;font-size:0.88rem;color:var(--text-secondary);">
+                    <i class="fa-solid fa-shield-halved" style="color:var(--purple-600);font-size:1.1rem;"></i>
+                    <span>1-Year Official Warranty</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.65rem;font-size:0.88rem;color:var(--text-secondary);">
+                    <i class="fa-solid fa-rotate-left" style="color:var(--blue-600);font-size:1.1rem;"></i>
+                    <span>30-Day Hassle-Free Returns</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Related Products Section -->
+<section class="section section-subtle">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <span class="section-eyebrow">You Might Also Like</span>
+                <h2 class="section-title">Related Products</h2>
+            </div>
+            <a href="{{ url_for('shop', category=product['category_slug']) }}" class="btn btn-outline btn-sm">
+                More in {{ product['category_name'] }} <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="products-grid">
+            {% for rel in related_products %}
+            <article class="product-card">
+                <div class="product-media">
+                    {% if rel['discount_price'] and rel['discount_price'] < rel['price'] %}
+                        {% set pct = (((rel['price'] - rel['discount_price']) / rel['price']) * 100) | round | int %}
+                        <div class="product-badges">
+                            <span class="badge badge-sale">-{{ pct }}% OFF</span>
+                        </div>
+                    {% endif %}
+                    <a href="{{ url_for('product_details', product_id=rel['id']) }}" style="width:100%;height:100%;">
+                        <img src="{{ rel['image_url'] }}" alt="{{ rel['name'] }}">
+                    </a>
+                </div>
+                <div class="product-body">
+                    <div class="product-meta">
+                        <span class="product-category-tag">{{ rel['category_name'] }}</span>
+                        <span class="product-rating"><i class="fa-solid fa-star"></i> {{ rel['rating'] }}</span>
+                    </div>
+                    <h3 class="product-title">
+                        <a href="{{ url_for('product_details', product_id=rel['id']) }}">{{ rel['name'] }}</a>
+                    </h3>
+                    <div class="product-footer">
+                        <div class="price-group">
+                            {% if rel['discount_price'] and rel['discount_price'] < rel['price'] %}
+                                <span class="price-current">${{ "%.2f"|format(rel['discount_price']) }}</span>
+                                <span class="price-old">${{ "%.2f"|format(rel['price']) }}</span>
+                            {% else %}
+                                <span class="price-current">${{ "%.2f"|format(rel['price']) }}</span>
+                            {% endif %}
+                        </div>
+                        <form action="{{ url_for('add_to_cart') }}" method="POST" class="js-add-to-cart-form">
+                            <input type="hidden" name="product_id" value="{{ rel['id'] }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fa-solid fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

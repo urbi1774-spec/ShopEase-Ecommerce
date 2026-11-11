@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5f3ff"/>
+      <stop offset="100%" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="shoeBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <filter id="shadow3" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="20" flood-color="#312e81" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <rect width="600" height="600" rx="32" fill="url(#bg3)"/>
+  <circle cx="300" cy="300" r="190" fill="#ffffff" opacity="0.6"/>
+  <g filter="url(#shadow3)" transform="rotate(-10 300 310)">
+    <!-- Upper Mesh -->
+    <path d="M 120 340 Q 130 230 210 215 L 285 265 Q 355 280 450 295 Q 495 305 495 345 L 120 345 Z" fill="url(#shoeBody)"/>
+    <!-- Accent Stripes -->
+    <path d="M 225 265 L 335 325 L 365 325 L 255 255 Z" fill="#ffffff" opacity="0.9"/>
+    <path d="M 275 275 L 375 325 L 398 325 L 300 268 Z" fill="#a78bfa" opacity="0.9"/>
+    <!-- Collar & Tongue -->
+    <path d="M 145 265 Q 185 275 220 220 L 255 245 Q 200 300 135 295 Z" fill="#1e1b4b"/>
+    <!-- Midsole Nitro Foam -->
+    <path d="M 105 340 L 505 340 Q 518 368 485 385 L 120 385 Q 92 370 105 340 Z" fill="#ffffff"/>
+    <rect x="135" y="355" width="120" height="14" rx="7" fill="#c4b5fd"/>
+    <rect x="330" y="357" width="95" height="10" rx="5" fill="#93c5fd"/>
+    <!-- Outsole -->
+    <path d="M 120 385 L 485 385 L 470 398 L 130 398 Z" fill="#0f172a"/>
+  </g>
+  <text x="300" y="545" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="700" fill="#4338ca" text-anchor="middle" letter-spacing="2">VELOCITY NITRO CLOUD</text>
+</svg>

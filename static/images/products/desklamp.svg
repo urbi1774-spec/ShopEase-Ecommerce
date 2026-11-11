@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg9" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#ede9fe"/>
+    </linearGradient>
+    <linearGradient id="glow9" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="shadow9" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#1e1b4b" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="600" height="600" rx="32" fill="url(#bg9)"/>
+  <polygon points="180,175 430,175 495,435 115,435" fill="url(#glow9)"/>
+  <g filter="url(#shadow9)">
+    <!-- Base Qi2 Pad -->
+    <ellipse cx="300" cy="435" rx="115" ry="26" fill="#1e293b"/>
+    <ellipse cx="300" cy="430" rx="95" ry="18" fill="#334155"/>
+    <circle cx="330" cy="430" r="18" fill="none" stroke="#8b5cf6" stroke-width="3"/>
+    <!-- Vertical Stem -->
+    <rect x="205" y="155" width="18" height="275" rx="9" fill="#0f172a"/>
+    <circle cx="214" cy="165" r="14" fill="#6d28d9"/>
+    <!-- Horizontal Light Bar -->
+    <rect x="195" y="152" width="245" height="22" rx="11" fill="#1e293b"/>
+    <rect x="220" y="168" width="205" height="8" rx="4" fill="#c4b5fd"/>
+  </g>
+  <text x="300" y="545" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="700" fill="#4338ca" text-anchor="middle" letter-spacing="2">LUMINA QI2 DESK LAMP</text>
+</svg>

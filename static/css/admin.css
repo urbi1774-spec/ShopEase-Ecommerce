@@ -1,0 +1,300 @@
+/* ==========================================================================
+   ShopEase - Professional Admin Dashboard Stylesheet
+   ========================================================================== */
+
+:root {
+    --admin-sidebar-bg: #0f172a;
+    --admin-sidebar-hover: #1e293b;
+    --admin-accent: #7c3aed;
+    --admin-blue: #2563eb;
+    --admin-bg: #f1f5f9;
+    --admin-card: #ffffff;
+    --admin-border: #e2e8f0;
+    --admin-text: #0f172a;
+    --admin-muted: #64748b;
+}
+
+body.admin-body {
+    background-color: var(--admin-bg);
+    color: var(--admin-text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 265px;
+    background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%);
+    color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.12);
+}
+
+.admin-brand {
+    padding: 1.5rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.admin-brand-badge {
+    font-size: 0.68rem;
+    background: rgba(124, 58, 237, 0.35);
+    border: 1px solid #8b5cf6;
+    color: #ddd6fe;
+    padding: 0.15rem 0.5rem;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.admin-nav {
+    padding: 1.25rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+}
+
+.admin-nav-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    padding: 0.75rem 0.85rem 0.35rem;
+    font-weight: 700;
+}
+
+.admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    color: #cbd5e1;
+    font-weight: 500;
+    font-size: 0.92rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.admin-nav-link i {
+    width: 20px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.admin-nav-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.admin-nav-link.active {
+    background: linear-gradient(135deg, #6d28d9 0%, #2563eb 100%);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 6px 16px rgba(109, 40, 217, 0.35);
+}
+
+.admin-sidebar-footer {
+    padding: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.85rem;
+}
+
+.admin-main {
+    margin-left: 265px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.admin-topbar {
+    height: 72px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--admin-border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+}
+
+.admin-content {
+    padding: 2rem;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* KPI Stat Cards */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-card {
+    background: #ffffff;
+    border: 1px solid var(--admin-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(79, 70, 229, 0.08);
+}
+
+.kpi-info span {
+    font-size: 0.85rem;
+    color: var(--admin-muted);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.4rem;
+}
+
+.kpi-info h3 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--admin-text);
+}
+
+.kpi-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.kpi-purple { background: #ede9fe; color: #6d28d9; }
+.kpi-blue { background: #dbeafe; color: #1d4ed8; }
+.kpi-green { background: #d1fae5; color: #047857; }
+.kpi-amber { background: #fef3c7; color: #b45309; }
+
+/* Admin Cards & Tables */
+.admin-card {
+    background: #ffffff;
+    border: 1px solid var(--admin-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.admin-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table-wrap {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 0.9rem 1rem;
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--admin-border);
+    vertical-align: middle;
+}
+
+.admin-table tr:hover td {
+    background-color: #f8fafc;
+}
+
+.table-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    object-fit: contain;
+    padding: 4px;
+    border: 1px solid var(--admin-border);
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.status-Pending { background: #fef3c7; color: #b45309; }
+.status-Processing { background: #dbeafe; color: #1d4ed8; }
+.status-Shipped { background: #ede9fe; color: #6d28d9; }
+.status-Delivered { background: #d1fae5; color: #047857; }
+.status-Cancelled { background: #fee2e2; color: #b91c1c; }
+
+@media (max-width: 1024px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .admin-sidebar {
+        width: 76px;
+    }
+    .admin-sidebar .hide-tablet {
+        display: none;
+    }
+    .admin-main {
+        margin-left: 76px;
+    }
+}
+
+@media (max-width: 640px) {
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    .admin-content {
+        padding: 1rem;
+    }
+}

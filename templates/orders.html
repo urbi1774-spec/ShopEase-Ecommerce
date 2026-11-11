@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Order History — ShopEase{% endblock %}
+
+{% block content %}
+<section class="page-banner">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+        <div>
+            <div class="breadcrumb">
+                <a href="{{ url_for('index') }}">Home</a>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i>
+                <a href="{{ url_for('profile') }}">My Account</a>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i>
+                <span>Order History</span>
+            </div>
+            <h1 style="font-size:2.1rem;font-weight:800;">My Orders</h1>
+        </div>
+
+        <!-- Status Filter Pills -->
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <a href="{{ url_for('customer_orders') }}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline{% endif %}">All</a>
+            {% for st in ['Pending', 'Processing', 'Shipped', 'Delivered'] %}
+                <a href="{{ url_for('customer_orders', status=st) }}" class="btn btn-sm {% if status_filter == st %}btn-primary{% else %}btn-outline{% endif %}">
+                    {{ st }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<div class="container" style="padding:2.5rem 1.5rem 4rem;">
+    {% if orders_with_items %}
+        <div style="display:flex;flex-direction:column;gap:1.5rem;">
+            {% for entry in orders_with_items %}
+            {% set o = entry['order'] %}
+            <div class="form-card" style="padding:0;overflow:hidden;">
+                <!-- Order Card Header -->
+                <div style="background:var(--bg-secondary);padding:1.15rem 1.5rem;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+                    <div style="display:flex;gap:2rem;flex-wrap:wrap;">
+                        <div>
+                            <div style="font-size:0.74rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Order Number</div>
+                            <div style="font-weight:800;color:var(--purple-700);">{{ o['order_number'] }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.74rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Date Placed</div>
+                            <div style="font-weight:600;font-size:0.9rem;">{{ o['created_at'][:16] }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.74rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Payment</div>
+                            <div style="font-weight:600;font-size:0.9rem;">{{ o['payment_method'] }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.74rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Total Amount</div>
+                            <div style="font-weight:800;font-size:1rem;">${{ "%.2f"|format(o['total_amount']) }}</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                        {% if o['status'] == 'Delivered' %}
+                            <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Delivered</span>
+                        {% elif o['status'] == 'Shipped' %}
+                            <span class="badge badge-purple"><i class="fa-solid fa-truck-fast"></i> Shipped</span>
+                        {% elif o['status'] == 'Processing' %}
+                            <span class="badge badge-blue"><i class="fa-solid fa-gears"></i> Processing</span>
+                        {% elif o['status'] == 'Cancelled' %}
+                            <span class="badge badge-danger"><i class="fa-solid fa-ban"></i> Cancelled</span>
+                        {% else %}
+                            <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> Pending</span>
+                        {% endif %}
+
+                        <a href="{{ url_for('order_confirmation', order_number=o['order_number']) }}" class="btn btn-outline btn-sm">
+                            View Receipt
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Order Items List -->
+                <div style="padding:1.25rem 1.5rem;">
+                    {% for item in entry['items'] %}
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;border-bottom:1px solid var(--border-color);gap:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;">
+                            <img src="{{ item['product_image'] }}" alt="{{ item['product_name'] }}" style="width:56px;height:56px;object-fit:contain;background:var(--bg-secondary);border-radius:10px;padding:4px;border:1px solid var(--border-color);">
+                            <div>
+                                <a href="{{ url_for('product_details', product_id=item['product_id']) if item['product_id'] else '#' }}" style="font-weight:700;font-size:0.98rem;">
+                                    {{ item['product_name'] }}
+                                </a>
+                                <div style="font-size:0.84rem;color:var(--text-muted);">
+                                    Quantity: <strong>{{ item['quantity'] }}</strong> &bull; Unit Price: ${{ "%.2f"|format(item['unit_price']) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="font-weight:800;font-size:1rem;">
+                            ${{ "%.2f"|format(item['subtotal']) }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div style="padding-top:0.85rem;font-size:0.85rem;color:var(--text-secondary);display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+                        <span><i class="fa-solid fa-location-dot" style="color:var(--purple-600);"></i> Shipping To: <strong>{{ o['shipping_address'] }}, {{ o['city'] }} {{ o['postal_code'] }}</strong></span>
+                        <span>Phone: <strong>{{ o['phone'] }}</strong></span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fa-solid fa-box-open"></i></div>
+            <h2 style="font-size:1.65rem;font-weight:800;margin-bottom:0.5rem;">No Orders Found</h2>
+            <p style="color:var(--text-secondary);max-width:440px;margin:0 auto 1.5rem;">
+                You haven't placed any orders matching this filter yet. Start shopping and check out with Cash on Delivery!
+            </p>
+            <a href="{{ url_for('shop') }}" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-bag-shopping"></i> Browse Products
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

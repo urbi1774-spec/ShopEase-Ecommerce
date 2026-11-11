@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}Your Shopping Cart — ShopEase{% endblock %}
+
+{% block content %}
+<section class="page-banner">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{{ url_for('index') }}">Home</a>
+            <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i>
+            <span>Shopping Cart</span>
+        </div>
+        <h1 style="font-size:2.1rem;font-weight:800;">Your Shopping Cart</h1>
+    </div>
+</section>
+
+<div class="container">
+    {% if cart['items'] %}
+    <div class="cart-grid">
+        <!-- Cart Items List -->
+        <div class="cart-table-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:1rem;border-bottom:1px solid var(--border-color);margin-bottom:0.5rem;">
+                <h2 style="font-size:1.15rem;font-weight:800;">
+                    Cart Items ({{ cart['total_qty'] }})
+                </h2>
+                <form action="{{ url_for('clear_cart') }}" method="POST" data-confirm-title="Clear Entire Cart" data-confirm="Are you sure you want to remove all items from your shopping cart?">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fa-regular fa-trash-can"></i> Clear Cart
+                    </button>
+                </form>
+            </div>
+
+            {% for item in cart['items'] %}
+            <div class="cart-item-row js-cart-item" data-product-id="{{ item['product_id'] }}">
+                <a href="{{ url_for('product_details', product_id=item['product_id']) }}">
+                    <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}" class="cart-item-img">
+                </a>
+
+                <div>
+                    <span style="font-size:0.75rem;font-weight:700;color:var(--purple-700);">{{ item['brand'] }}</span>
+                    <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.25rem;">
+                        <a href="{{ url_for('product_details', product_id=item['product_id']) }}">{{ item['name'] }}</a>
+                    </h3>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);">
+                        Unit Price: <strong style="color:var(--text-main);">${{ "%.2f"|format(item['unit_price']) }}</strong>
+                        {% if item['discount_price'] and item['discount_price'] < item['price'] %}
+                            <span style="text-decoration:line-through;color:var(--text-light);margin-left:6px;">${{ "%.2f"|format(item['price']) }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quantity Controls -->
+                <div class="qty-selector">
+                    <button type="button" class="qty-btn js-cart-dec" aria-label="Decrease quantity">&minus;</button>
+                    <input type="number" value="{{ item['quantity'] }}" min="1" max="{{ item['stock'] }}" class="qty-input js-cart-qty" readonly>
+                    <button type="button" class="qty-btn js-cart-inc" aria-label="Increase quantity">&plus;</button>
+                </div>
+
+                <!-- Item Line Subtotal -->
+                <div style="min-width:95px;text-align:right;">
+                    <span class="js-line-total" style="font-size:1.1rem;font-weight:800;color:var(--text-main);">
+                        ${{ "%.2f"|format(item['line_total']) }}
+                    </span>
+                </div>
+
+                <!-- Remove Button -->
+                <div>
+                    <button type="button" class="btn btn-outline btn-sm js-cart-remove" title="Remove Item" style="color:var(--danger);border-color:#fecaca;">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div style="margin-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                <a href="{{ url_for('shop') }}" class="btn btn-outline">
+                    <i class="fa-solid fa-arrow-left"></i> Continue Shopping
+                </a>
+                {% if not current_user_id %}
+                <span style="font-size:0.85rem;color:var(--text-muted);">
+                    <i class="fa-solid fa-cloud-arrow-up" style="color:var(--purple-600);"></i>
+                    <a href="{{ url_for('login', next='/cart') }}" style="color:var(--purple-700);font-weight:600;">Sign in</a> to save your cart across devices.
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Order Summary Panel -->
+        <aside class="summary-card">
+            <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:1rem;padding-bottom:0.85rem;border-bottom:1px solid var(--border-color);">
+                Order Summary
+            </h3>
+
+            <div class="summary-row">
+                <span>Subtotal ({{ cart['total_qty'] }} items)</span>
+                <strong id="cart-subtotal">${{ "%.2f"|format(cart['subtotal']) }}</strong>
+            </div>
+
+            {% if cart['discount_savings'] > 0 %}
+            <div class="summary-row" style="color:var(--success);">
+                <span>Promotional Savings</span>
+                <strong id="cart-savings">-${{ "%.2f"|format(cart['discount_savings']) }}</strong>
+            </div>
+            {% endif %}
+
+            <div class="summary-row">
+                <span>Shipping Estimate</span>
+                <strong id="cart-shipping">
+                    {% if cart['shipping_fee'] == 0 %}
+                        <span style="color:var(--success);">FREE</span>
+                    {% else %}
+                        ${{ "%.2f"|format(cart['shipping_fee']) }}
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="summary-row">
+                <span>Payment Method</span>
+                <span class="badge badge-purple">Cash on Delivery</span>
+            </div>
+
+            <div class="summary-row total">
+                <span>Total Amount</span>
+                <span id="cart-total" style="color:var(--purple-700);">${{ "%.2f"|format(cart['total_amount']) }}</span>
+            </div>
+
+            <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-lg btn-block" style="margin-top:1.5rem;">
+                Proceed to Checkout <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+            <div style="margin-top:1.25rem;padding:0.9rem;border-radius:var(--radius-sm);background:var(--purple-50);font-size:0.82rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.65rem;">
+                <i class="fa-solid fa-shield-halved" style="color:var(--purple-700);font-size:1.1rem;"></i>
+                <span>Zero upfront risk. Pay in cash only when your order arrives at your doorstep.</span>
+            </div>
+        </aside>
+    </div>
+    {% else %}
+    <!-- Empty Cart State -->
+    <div style="padding:3rem 0 5rem;">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+            <h2 style="font-size:1.75rem;font-weight:800;margin-bottom:0.5rem;">Your Shopping Cart is Empty</h2>
+            <p style="color:var(--text-secondary);max-width:440px;margin:0 auto 1.75rem;">
+                Looks like you haven't added any items to your cart yet. Explore our flagship tech, wearables, and apparel to get started!
+            </p>
+            <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+                <a href="{{ url_for('shop') }}" class="btn btn-primary btn-lg">
+                    <i class="fa-solid fa-bag-shopping"></i> Start Shopping
+                </a>
+                <a href="{{ url_for('deals') }}" class="btn btn-secondary btn-lg">
+                    <i class="fa-solid fa-bolt"></i> View Flash Deals
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — ShopEase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="admin-body">
+
+    <!-- Admin Sidebar Navigation -->
+    <aside class="admin-sidebar">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-brand">
+            <span class="brand-logo-icon" style="width:36px;height:36px;font-size:1rem;"><i class="fa-solid fa-bag-shopping"></i></span>
+            <span class="hide-tablet">ShopEase <span class="admin-brand-badge">Admin</span></span>
+        </a>
+
+        <nav class="admin-nav">
+            <span class="admin-nav-label hide-tablet">Analytics &amp; Store</span>
+            <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link active">
+                <i class="fa-solid fa-gauge-high"></i> <span class="hide-tablet">Dashboard Overview</span>
+            </a>
+            <a href="{{ url_for('admin_products') }}" class="admin-nav-link">
+                <i class="fa-solid fa-boxes-stacked"></i> <span class="hide-tablet">Products ({{ total_products }})</span>
+            </a>
+            <a href="{{ url_for('admin_add_product') }}" class="admin-nav-link">
+                <i class="fa-solid fa-circle-plus"></i> <span class="hide-tablet">Add New Product</span>
+            </a>
+            <a href="{{ url_for('admin_categories') }}" class="admin-nav-link">
+                <i class="fa-solid fa-layer-group"></i> <span class="hide-tablet">Categories ({{ total_categories }})</span>
+            </a>
+            <a href="{{ url_for('admin_orders') }}" class="admin-nav-link">
+                <i class="fa-solid fa-receipt"></i> <span class="hide-tablet">Orders ({{ total_orders }})</span>
+            </a>
+            <a href="{{ url_for('admin_customers') }}" class="admin-nav-link">
+                <i class="fa-solid fa-users"></i> <span class="hide-tablet">Customers ({{ total_customers }})</span>
+            </a>
+
+            <span class="admin-nav-label hide-tablet" style="margin-top:1rem;">Quick Links</span>
+            <a href="{{ url_for('index') }}" class="admin-nav-link" target="_blank">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hide-tablet">View Live Storefront</span>
+            </a>
+            <a href="{{ url_for('admin_logout') }}" class="admin-nav-link" style="color:#fca5a5;">
+                <i class="fa-solid fa-right-from-bracket"></i> <span class="hide-tablet">Sign Out</span>
+            </a>
+        </nav>
+
+        <div class="admin-sidebar-footer hide-tablet">
+            <div style="font-weight:700;color:#ffffff;">{{ current_admin_name }}</div>
+            <div style="font-size:0.76rem;color:#94a3b8;">System Administrator</div>
+        </div>
+    </aside>
+
+    <!-- Main Admin Content Area -->
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <div>
+                <h1 style="font-size:1.35rem;font-weight:800;">Executive Dashboard Overview</h1>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-plus"></i> Add Product
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-outline btn-sm">
+                    <i class="fa-solid fa-store"></i> Storefront
+                </a>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div style="display:none;">
+                    {% for category, message in messages %}
+                        <div class="server-toast" data-category="{{ category }}" data-message="{{ message }}"></div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="admin-content">
+            <!-- 4 KPI Overview Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <span>Total Revenue (Sales)</span>
+                        <h3>${{ "%.2f"|format(total_sales) }}</h3>
+                        <small style="color:#10b981;font-weight:600;font-size:0.78rem;"><i class="fa-solid fa-arrow-trend-up"></i> Cash on Delivery Active</small>
+                    </div>
+                    <div class="kpi-icon kpi-purple"><i class="fa-solid fa-sack-dollar"></i></div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <span>Total Orders</span>
+                        <h3>{{ total_orders }}</h3>
+                        <small style="color:var(--blue-600);font-weight:600;font-size:0.78rem;">{{ status_counts['Delivered'] }} Delivered &bull; {{ status_counts['Pending'] }} Pending</small>
+                    </div>
+                    <div class="kpi-icon kpi-blue"><i class="fa-solid fa-bag-shopping"></i></div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <span>Total Products</span>
+                        <h3>{{ total_products }}</h3>
+                        <small style="color:#047857;font-weight:600;font-size:0.78rem;">Across {{ total_categories }} Categories</small>
+                    </div>
+                    <div class="kpi-icon kpi-green"><i class="fa-solid fa-boxes-stacked"></i></div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <span>Registered Customers</span>
+                        <h3>{{ total_customers }}</h3>
+                        <small style="color:#b45309;font-weight:600;font-size:0.78rem;">Verified Accounts</small>
+                    </div>
+                    <div class="kpi-icon kpi-amber"><i class="fa-solid fa-user-group"></i></div>
+                </div>
+            </div>
+
+            <!-- Order Status Pipeline Breakdown -->
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2 style="font-size:1.1rem;font-weight:800;">
+                        <i class="fa-solid fa-chart-pie" style="color:var(--purple-600);margin-right:6px;"></i>
+                        Order Fulfillment Pipeline
+                    </h2>
+                    <a href="{{ url_for('admin_orders') }}" class="btn btn-secondary btn-sm">Manage All Orders</a>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:1rem;">
+                    {% for st, count in status_counts.items() %}
+                    <a href="{{ url_for('admin_orders', status=st) }}" style="padding:1rem;border-radius:12px;border:1px solid var(--admin-border);background:#f8fafc;display:flex;align-items:center;justify-content:space-between;">
+                        <span class="status-pill status-{{ st }}">{{ st }}</span>
+                        <strong style="font-size:1.35rem;font-weight:800;">{{ count }}</strong>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Recent Orders Table -->
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2 style="font-size:1.1rem;font-weight:800;">
+                        <i class="fa-solid fa-clock-rotate-left" style="color:var(--blue-600);margin-right:6px;"></i>
+                        Recent Customer Orders
+                    </h2>
+                    <a href="{{ url_for('admin_orders') }}" class="btn btn-outline btn-sm">View All Orders &rarr;</a>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Destination</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Quick Update</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for o in recent_orders %}
+                            <tr>
+                                <td><strong style="color:var(--purple-700);">{{ o['order_number'] }}</strong></td>
+                                <td>
+                                    <div style="font-weight:700;">{{ o['customer_name'] }}</div>
+                                    <div style="font-size:0.78rem;color:var(--admin-muted);">{{ o['phone'] }}</div>
+                                </td>
+                                <td>{{ o['city'] }}</td>
+                                <td><strong>${{ "%.2f"|format(o['total_amount']) }}</strong></td>
+                                <td><span class="status-pill status-{{ o['status'] }}">{{ o['status'] }}</span></td>
+                                <td style="font-size:0.82rem;color:var(--admin-muted);">{{ o['created_at'][:16] }}</td>
+                                <td>
+                                    <form action="{{ url_for('admin_orders') }}" method="POST" style="display:flex;gap:0.4rem;">
+                                        <input type="hidden" name="order_id" value="{{ o['id'] }}">
+                                        <select name="status" class="form-control" style="padding:0.35rem 0.6rem;font-size:0.8rem;width:auto;">
+                                            {% for st in ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'] %}
+                                                <option value="{{ st }}" {% if o['status'] == st %}selected{% endif %}>{{ st }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="submit" class="btn btn-primary btn-sm" style="padding:0.35rem 0.7rem;">Save</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Two Column: Top Performing Products & Inventory Alerts -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(380px, 1fr));gap:1.5rem;">
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3 style="font-size:1.05rem;font-weight:800;">
+                            <i class="fa-solid fa-fire" style="color:var(--purple-600);margin-right:6px;"></i>
+                            Most Viewed Products
+                        </h3>
+                    </div>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Views</th>
+                                    <th>Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in top_products %}
+                                <tr>
+                                    <td style="display:flex;align-items:center;gap:0.75rem;">
+                                        <img src="{{ p['image_url'] }}" alt="{{ p['name'] }}" class="table-thumb">
+                                        <div>
+                                            <div style="font-weight:700;">{{ p['name'] }}</div>
+                                            <div style="font-size:0.76rem;color:var(--admin-muted);">{{ p['category_name'] }}</div>
+                                        </div>
+                                    </td>
+                                    <td><strong>${{ "%.2f"|format(p['discount_price'] or p['price']) }}</strong></td>
+                                    <td><span class="badge badge-blue">{{ p['views'] }} views</span></td>
+                                    <td>{{ p['stock'] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3 style="font-size:1.05rem;font-weight:800;">
+                            <i class="fa-solid fa-boxes-packing" style="color:#f59e0b;margin-right:6px;"></i>
+                            Inventory Stock Watch (Stock &le; 20)
+                        </h3>
+                    </div>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>SKU</th>
+                                    <th>Remaining</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in low_stock_products %}
+                                <tr>
+                                    <td style="font-weight:700;">{{ p['name'] }}</td>
+                                    <td><code>{{ p['sku'] }}</code></td>
+                                    <td>
+                                        {% if p['stock'] <= 0 %}
+                                            <span class="badge badge-danger">Out of Stock</span>
+                                        {% else %}
+                                            <span class="badge badge-warning">{{ p['stock'] }} units</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('admin_edit_product', product_id=p['id']) }}" class="btn btn-outline btn-sm">Restock</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

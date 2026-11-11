@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders — ShopEase Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="admin-body">
+
+    <aside class="admin-sidebar">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-brand">
+            <span class="brand-logo-icon" style="width:36px;height:36px;font-size:1rem;"><i class="fa-solid fa-bag-shopping"></i></span>
+            <span class="hide-tablet">ShopEase <span class="admin-brand-badge">Admin</span></span>
+        </a>
+
+        <nav class="admin-nav">
+            <span class="admin-nav-label hide-tablet">Analytics &amp; Store</span>
+            <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link">
+                <i class="fa-solid fa-gauge-high"></i> <span class="hide-tablet">Dashboard Overview</span>
+            </a>
+            <a href="{{ url_for('admin_products') }}" class="admin-nav-link">
+                <i class="fa-solid fa-boxes-stacked"></i> <span class="hide-tablet">Products</span>
+            </a>
+            <a href="{{ url_for('admin_add_product') }}" class="admin-nav-link">
+                <i class="fa-solid fa-circle-plus"></i> <span class="hide-tablet">Add New Product</span>
+            </a>
+            <a href="{{ url_for('admin_categories') }}" class="admin-nav-link">
+                <i class="fa-solid fa-layer-group"></i> <span class="hide-tablet">Categories</span>
+            </a>
+            <a href="{{ url_for('admin_orders') }}" class="admin-nav-link active">
+                <i class="fa-solid fa-receipt"></i> <span class="hide-tablet">Orders</span>
+            </a>
+            <a href="{{ url_for('admin_customers') }}" class="admin-nav-link">
+                <i class="fa-solid fa-users"></i> <span class="hide-tablet">Customers</span>
+            </a>
+
+            <span class="admin-nav-label hide-tablet" style="margin-top:1rem;">Quick Links</span>
+            <a href="{{ url_for('index') }}" class="admin-nav-link" target="_blank">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hide-tablet">View Live Storefront</span>
+            </a>
+            <a href="{{ url_for('admin_logout') }}" class="admin-nav-link" style="color:#fca5a5;">
+                <i class="fa-solid fa-right-from-bracket"></i> <span class="hide-tablet">Sign Out</span>
+            </a>
+        </nav>
+    </aside>
+
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <h1 style="font-size:1.35rem;font-weight:800;">Customer Order Management</h1>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div style="display:none;">
+                    {% for category, message in messages %}
+                        <div class="server-toast" data-category="{{ category }}" data-message="{{ message }}"></div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="admin-content">
+            <!-- Search & Status Filter Bar -->
+            <div class="admin-card">
+                <form action="{{ url_for('admin_orders') }}" method="GET" style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;">
+                    <div style="flex:1;min-width:240px;">
+                        <label class="form-label">Search Orders</label>
+                        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Order number, customer name, email, or phone...">
+                    </div>
+                    <div style="min-width:200px;">
+                        <label class="form-label">Fulfillment Status</label>
+                        <select name="status" class="form-control">
+                            <option value="">All Statuses</option>
+                            {% for st in ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'] %}
+                                <option value="{{ st }}" {% if status_filter == st %}selected{% endif %}>{{ st }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;">
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Filter</button>
+                        <a href="{{ url_for('admin_orders') }}" class="btn btn-outline">Reset</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Orders List -->
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2 style="font-size:1.1rem;font-weight:800;">Showing {{ orders_list|length }} Order(s)</h2>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order Info</th>
+                                <th>Customer &amp; Contact</th>
+                                <th>Shipping Address</th>
+                                <th>Ordered Items</th>
+                                <th>Total (COD)</th>
+                                <th>Status</th>
+                                <th>Update Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in orders_list %}
+                            {% set o = entry['order'] %}
+                            <tr>
+                                <td>
+                                    <div style="font-weight:800;color:var(--purple-700);">{{ o['order_number'] }}</div>
+                                    <div style="font-size:0.76rem;color:var(--admin-muted);">{{ o['created_at'][:16] }}</div>
+                                </td>
+                                <td>
+                                    <div style="font-weight:700;">{{ o['customer_name'] }}</div>
+                                    <div style="font-size:0.8rem;color:var(--admin-muted);">{{ o['customer_email'] }}</div>
+                                    <div style="font-size:0.8rem;color:var(--blue-600);font-weight:600;">{{ o['phone'] }}</div>
+                                </td>
+                                <td style="max-width:220px;font-size:0.85rem;">
+                                    {{ o['shipping_address'] }}, {{ o['city'] }} {{ o['postal_code'] }}
+                                    {% if o['order_notes'] %}
+                                        <div style="font-size:0.75rem;color:#b45309;margin-top:2px;">Note: {{ o['order_notes'] }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% for item in entry['items'] %}
+                                        <div style="font-size:0.82rem;margin-bottom:3px;">
+                                            <strong>{{ item['quantity'] }}&times;</strong> {{ item['product_name'] }}
+                                        </div>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <strong style="font-size:1.05rem;">${{ "%.2f"|format(o['total_amount']) }}</strong>
+                                    <div style="font-size:0.72rem;color:var(--admin-muted);">{{ o['payment_method'] }}</div>
+                                </td>
+                                <td>
+                                    <span class="status-pill status-{{ o['status'] }}">{{ o['status'] }}</span>
+                                </td>
+                                <td>
+                                    <form action="{{ url_for('admin_orders') }}" method="POST" style="display:flex;gap:0.4rem;">
+                                        <input type="hidden" name="order_id" value="{{ o['id'] }}">
+                                        <select name="status" class="form-control" style="padding:0.4rem 0.6rem;font-size:0.82rem;width:auto;">
+                                            {% for st in ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'] %}
+                                                <option value="{{ st }}" {% if o['status'] == st %}selected{% endif %}>{{ st }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" style="text-align:center;padding:2.5rem;color:var(--admin-muted);">
+                                    No orders matched your search criteria.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

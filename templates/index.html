@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+{% block title %}ShopEase — Elevate Your Everyday Shopping{% endblock %}
+
+{% block content %}
+{% if error_404 %}
+<section class="section">
+    <div class="container">
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fa-solid fa-compass"></i></div>
+            <h2 style="font-size:1.85rem;font-weight:800;margin-bottom:0.5rem;">Page Not Found (404)</h2>
+            <p style="color:var(--text-secondary);max-width:460px;margin:0 auto 1.5rem;">
+                The page or product you are looking for may have been moved or is no longer available.
+            </p>
+            <div style="display:flex;gap:1rem;justify-content:center;">
+                <a href="{{ url_for('index') }}" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>
+                <a href="{{ url_for('shop') }}" class="btn btn-outline"><i class="fa-solid fa-store"></i> Browse Catalog</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% else %}
+
+<!-- 1. HERO BANNER -->
+<section class="hero-section">
+    <div class="container hero-grid">
+        <div>
+            <span class="hero-eyebrow">
+                <i class="fa-solid fa-sparkles"></i> NEW SEASON COLLECTION 2026
+            </span>
+            <h1 class="hero-title">
+                Next-Gen Tech &amp; Lifestyle Gear, <span class="brand-text-gradient">Delivered Effortlessly.</span>
+            </h1>
+            <p class="hero-subtitle">
+                Discover flagship audio, titanium wearables, performance footwear, and modern workspace essentials with up to 30% off and zero-risk Cash on Delivery.
+            </p>
+            <div class="hero-cta-group">
+                <a href="{{ url_for('shop') }}" class="btn btn-primary btn-lg">
+                    <i class="fa-solid fa-bag-shopping"></i> Explore Shop
+                </a>
+                <a href="{{ url_for('deals') }}" class="btn btn-secondary btn-lg">
+                    <i class="fa-solid fa-fire"></i> View Flash Deals
+                </a>
+            </div>
+            <div class="hero-trust-metrics">
+                <div class="trust-metric">
+                    <strong>25k+</strong>
+                    <span>Happy Customers</span>
+                </div>
+                <div class="trust-metric">
+                    <strong>4.9/5</strong>
+                    <span>Verified Rating</span>
+                </div>
+                <div class="trust-metric">
+                    <strong>100%</strong>
+                    <span>Cash on Delivery</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-showcase-card">
+            <span class="badge badge-sale" style="position:absolute;top:1.5rem;left:1.5rem;z-index:2;">
+                <i class="fa-solid fa-bolt"></i> Save $70 Today
+            </span>
+            <img src="{{ url_for('static', filename='images/products/headphones.svg') }}" alt="AuraSonic Pro ANC Wireless Headphones">
+            <div class="hero-floating-pill">
+                <div>
+                    <div style="font-size:0.76rem;font-weight:700;color:var(--purple-700);text-transform:uppercase;">Flagship Audio</div>
+                    <div style="font-weight:800;font-size:1rem;">AuraSonic Pro ANC Headphones</div>
+                    <div style="font-size:0.9rem;font-weight:700;color:var(--blue-600);">$229.99 <span style="text-decoration:line-through;color:#94a3b8;font-weight:500;">$299.99</span></div>
+                </div>
+                <a href="{{ url_for('product_details', product_id=1) }}" class="btn btn-primary btn-sm">
+                    View <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES STRIP -->
+<section class="features-strip">
+    <div class="container features-strip-grid">
+        <div class="feature-pill">
+            <div class="feature-pill-icon"><i class="fa-solid fa-truck-fast"></i></div>
+            <div>
+                <h4>Free Express Shipping</h4>
+                <p>Complimentary delivery on orders $100+</p>
+            </div>
+        </div>
+        <div class="feature-pill">
+            <div class="feature-pill-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+            <div>
+                <h4>Cash on Delivery</h4>
+                <p>Pay conveniently at your doorstep</p>
+            </div>
+        </div>
+        <div class="feature-pill">
+            <div class="feature-pill-icon"><i class="fa-solid fa-rotate-left"></i></div>
+            <div>
+                <h4>30-Day Easy Returns</h4>
+                <p>Hassle-free replacement guarantee</p>
+            </div>
+        </div>
+        <div class="feature-pill">
+            <div class="feature-pill-icon"><i class="fa-solid fa-headset"></i></div>
+            <div>
+                <h4>24/7 Priority Support</h4>
+                <p>Dedicated product specialists ready</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. POPULAR CATEGORIES -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <span class="section-eyebrow">Curated Departments</span>
+                <h2 class="section-title">Shop by Popular Categories</h2>
+            </div>
+            <a href="{{ url_for('shop') }}" class="btn btn-outline btn-sm">
+                All Categories <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="categories-grid">
+            {% for cat in categories %}
+            <a href="{{ url_for('shop', category=cat['slug']) }}" class="category-card">
+                <div class="category-icon-box">
+                    <i class="fa-solid {{ cat['icon'] }}"></i>
+                </div>
+                <h3>{{ cat['name'] }}</h3>
+                <span>{{ cat['product_count'] }} Products</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 3. FEATURED PRODUCTS -->
+<section class="section section-subtle">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <span class="section-eyebrow">Handpicked Selection</span>
+                <h2 class="section-title">Featured Products</h2>
+            </div>
+            <a href="{{ url_for('shop') }}" class="btn btn-secondary btn-sm">
+                Browse Full Catalog <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="products-grid">
+            {% for product in featured_products %}
+            <article class="product-card">
+                <div class="product-media">
+                    <div class="product-badges">
+                        {% if product['discount_price'] and product['discount_price'] < product['price'] %}
+                            {% set pct = (((product['price'] - product['discount_price']) / product['price']) * 100) | round | int %}
+                            <span class="badge badge-sale">-{{ pct }}% OFF</span>
+                        {% endif %}
+                        {% if product['is_featured'] %}
+                            <span class="badge badge-purple">Featured</span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('product_details', product_id=product['id']) }}" class="product-quick-view" title="View Product Details">
+                        <i class="fa-regular fa-eye"></i>
+                    </a>
+                    <a href="{{ url_for('product_details', product_id=product['id']) }}" style="width:100%;height:100%;">
+                        <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
+                    </a>
+                </div>
+                <div class="product-body">
+                    <div class="product-meta">
+                        <span class="product-category-tag">{{ product['category_name'] }}</span>
+                        <span class="product-rating">
+                            <i class="fa-solid fa-star"></i> {{ product['rating'] }} ({{ product['reviews_count'] }})
+                        </span>
+                    </div>
+                    <h3 class="product-title">
+                        <a href="{{ url_for('product_details', product_id=product['id']) }}">{{ product['name'] }}</a>
+                    </h3>
+                    <div class="product-footer">
+                        <div class="price-group">
+                            {% if product['discount_price'] and product['discount_price'] < product['price'] %}
+                                <span class="price-current">${{ "%.2f"|format(product['discount_price']) }}</span>
+                                <span class="price-old">${{ "%.2f"|format(product['price']) }}</span>
+                            {% else %}
+                                <span class="price-current">${{ "%.2f"|format(product['price']) }}</span>
+                            {% endif %}
+                        </div>
+                        <form action="{{ url_for('add_to_cart') }}" method="POST" class="js-add-to-cart-form">
+                            <input type="hidden" name="product_id" value="{{ product['id'] }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-primary btn-sm" {% if product['stock'] <= 0 %}disabled{% endif %}>
+                                <i class="fa-solid fa-cart-plus"></i>
+                                {% if product['stock'] > 0 %}Add{% else %}Sold Out{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 4. TRENDING PRODUCTS -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <span class="section-eyebrow">Community Favorites</span>
+                <h2 class="section-title">Trending Right Now</h2>
+            </div>
+            <a href="{{ url_for('shop', sort='popular') }}" class="btn btn-outline btn-sm">
+                See All Trending <i class="fa-solid fa-fire" style="color:var(--purple-600);"></i>
+            </a>
+        </div>
+
+        <div class="products-grid">
+            {% for product in trending_products %}
+            <article class="product-card">
+                <div class="product-media">
+                    <div class="product-badges">
+                        <span class="badge badge-blue"><i class="fa-solid fa-fire"></i> Trending</span>
+                    </div>
+                    <a href="{{ url_for('product_details', product_id=product['id']) }}" class="product-quick-view" title="View Product Details">
+                        <i class="fa-regular fa-eye"></i>
+                    </a>
+                    <a href="{{ url_for('product_details', product_id=product['id']) }}" style="width:100%;height:100%;">
+                        <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
+                    </a>
+                </div>
+                <div class="product-body">
+                    <div class="product-meta">
+                        <span class="product-category-tag">{{ product['brand'] }}</span>
+                        <span class="product-rating"><i class="fa-solid fa-star"></i> {{ product['rating'] }}</span>
+                    </div>
+                    <h3 class="product-title">
+                        <a href="{{ url_for('product_details', product_id=product['id']) }}">{{ product['name'] }}</a>
+                    </h3>
+                    <div class="product-footer">
+                        <div class="price-group">
+                            {% if product['discount_price'] and product['discount_price'] < product['price'] %}
+                                <span class="price-current">${{ "%.2f"|format(product['discount_price']) }}</span>
+                                <span class="price-old">${{ "%.2f"|format(product['price']) }}</span>
+                            {% else %}
+                                <span class="price-current">${{ "%.2f"|format(product['price']) }}</span>
+                            {% endif %}
+                        </div>
+                        <form action="{{ url_for('add_to_cart') }}" method="POST" class="js-add-to-cart-form">
+                            <input type="hidden" name="product_id" value="{{ product['id'] }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fa-solid fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 5. PROMOTIONAL SECTION -->
+<section class="section" style="padding-top:1rem;">
+    <div class="container">
+        <div class="promo-banner">
+            <div>
+                <span class="badge badge-sale"><i class="fa-solid fa-stopwatch"></i> LIMITED TIME OFFER</span>
+                <h2>Upgrade Your Smart Fitness &amp; Workspace Setup</h2>
+                <p>
+                    Bundle our flagship ChronoPulse Ultra Titanium Smartwatch or KeyCraft Halo75 Mechanical Keyboard and enjoy instant promotional savings plus complimentary express delivery.
+                </p>
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <a href="{{ url_for('product_details', product_id=2) }}" class="btn btn-primary btn-lg">
+                        Shop Smartwatch Deal
+                    </a>
+                    <a href="{{ url_for('deals') }}" class="btn btn-outline btn-lg" style="background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.25);">
+                        View All Discounts
+                    </a>
+                </div>
+            </div>
+            <div style="display:flex;justify-content:center;">
+                <img src="{{ url_for('static', filename='images/products/smartwatch.svg') }}" alt="ChronoPulse Smartwatch" style="max-height:290px;border-radius:24px;box-shadow:0 20px 40px rgba(0,0,0,0.35);">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. LATEST ARRIVALS -->
+<section class="section section-subtle">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <span class="section-eyebrow">Just Landed</span>
+                <h2 class="section-title">Latest Arrivals</h2>
+            </div>
+            <a href="{{ url_for('shop', sort='newest') }}" class="btn btn-outline btn-sm">
+                View Newest <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="products-grid">
+            {% for product in latest_products %}
+            <article class="product-card">
+                <div class="product-media">
+                    <div class="product-badges">
+                        <span class="badge badge-purple">New Arrival</span>
+                    </div>
+                    <a href="{{ url_for('product_details', product_id=product['id']) }}" class="product-quick-view" title="View Product Details">
+                        <i class="fa-regular fa-eye"></i>
+                    </a>
+                    <a href="{{ url_for('product_details', product_id=product['id']) }}" style="width:100%;height:100%;">
+                        <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}">
+                    </a>
+                </div>
+                <div class="product-body">
+                    <div class="product-meta">
+                        <span class="product-category-tag">{{ product['category_name'] }}</span>
+                        <span class="product-rating"><i class="fa-solid fa-star"></i> {{ product['rating'] }}</span>
+                    </div>
+                    <h3 class="product-title">
+                        <a href="{{ url_for('product_details', product_id=product['id']) }}">{{ product['name'] }}</a>
+                    </h3>
+                    <div class="product-footer">
+                        <div class="price-group">
+                            {% if product['discount_price'] and product['discount_price'] < product['price'] %}
+                                <span class="price-current">${{ "%.2f"|format(product['discount_price']) }}</span>
+                                <span class="price-old">${{ "%.2f"|format(product['price']) }}</span>
+                            {% else %}
+                                <span class="price-current">${{ "%.2f"|format(product['price']) }}</span>
+                            {% endif %}
+                        </div>
+                        <form action="{{ url_for('add_to_cart') }}" method="POST" class="js-add-to-cart-form">
+                            <input type="hidden" name="product_id" value="{{ product['id'] }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fa-solid fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% endif %}
+{% endblock %}

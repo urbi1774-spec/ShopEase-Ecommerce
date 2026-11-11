@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if is_edit %}Edit Product{% else %}Add New Product{% endif %} — ShopEase Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="admin-body">
+
+    <aside class="admin-sidebar">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-brand">
+            <span class="brand-logo-icon" style="width:36px;height:36px;font-size:1rem;"><i class="fa-solid fa-bag-shopping"></i></span>
+            <span class="hide-tablet">ShopEase <span class="admin-brand-badge">Admin</span></span>
+        </a>
+
+        <nav class="admin-nav">
+            <span class="admin-nav-label hide-tablet">Analytics &amp; Store</span>
+            <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link">
+                <i class="fa-solid fa-gauge-high"></i> <span class="hide-tablet">Dashboard Overview</span>
+            </a>
+            <a href="{{ url_for('admin_products') }}" class="admin-nav-link {% if is_edit %}active{% endif %}">
+                <i class="fa-solid fa-boxes-stacked"></i> <span class="hide-tablet">Products</span>
+            </a>
+            <a href="{{ url_for('admin_add_product') }}" class="admin-nav-link {% if not is_edit %}active{% endif %}">
+                <i class="fa-solid fa-circle-plus"></i> <span class="hide-tablet">Add New Product</span>
+            </a>
+            <a href="{{ url_for('admin_categories') }}" class="admin-nav-link">
+                <i class="fa-solid fa-layer-group"></i> <span class="hide-tablet">Categories</span>
+            </a>
+            <a href="{{ url_for('admin_orders') }}" class="admin-nav-link">
+                <i class="fa-solid fa-receipt"></i> <span class="hide-tablet">Orders</span>
+            </a>
+            <a href="{{ url_for('admin_customers') }}" class="admin-nav-link">
+                <i class="fa-solid fa-users"></i> <span class="hide-tablet">Customers</span>
+            </a>
+        </nav>
+    </aside>
+
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <h1 style="font-size:1.35rem;font-weight:800;">
+                {% if is_edit %}Edit Product: {{ product['name'] }}{% else %}Add New Product to Catalog{% endif %}
+            </h1>
+            <a href="{{ url_for('admin_products') }}" class="btn btn-outline btn-sm">
+                <i class="fa-solid fa-arrow-left"></i> Back to Products
+            </a>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div style="display:none;">
+                    {% for category, message in messages %}
+                        <div class="server-toast" data-category="{{ category }}" data-message="{{ message }}"></div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="admin-content" style="max-width:920px;">
+            <div class="admin-card">
+                <form action="{{ url_for('admin_edit_product', product_id=product['id']) if is_edit else url_for('admin_add_product') }}"
+                      method="POST"
+                      enctype="multipart/form-data">
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Product Name *</label>
+                            <input type="text" name="name" required class="form-control" placeholder="e.g., AuraSonic Pro ANC Headphones" value="{{ product.get('name', '') if product else '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Category *</label>
+                            <select name="category_id" required class="form-control">
+                                <option value="">Select Category...</option>
+                                {% for cat in categories %}
+                                    <option value="{{ cat['id'] }}" {% if product and (product.get('category_id')|string) == (cat['id']|string) %}selected{% endif %}>
+                                        {{ cat['name'] }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Brand Name</label>
+                            <input type="text" name="brand" class="form-control" placeholder="ShopEase Originals" value="{{ product.get('brand', 'ShopEase Originals') if product else 'ShopEase Originals' }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">SKU Code</label>
+                            <input type="text" name="sku" class="form-control" placeholder="Auto-generated if left blank" value="{{ product.get('sku', '') if product else '' }}">
+                        </div>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Regular Price ($) *</label>
+                            <input type="number" step="0.01" min="0.01" name="price" required class="form-control" placeholder="199.99" value="{{ product.get('price', '') if product else '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Discount Price ($) (Optional)</label>
+                            <input type="number" step="0.01" min="0.01" name="discount_price" class="form-control" placeholder="149.99" value="{{ product.get('discount_price') or '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Stock Quantity *</label>
+                            <input type="number" step="1" min="0" name="stock" required class="form-control" placeholder="25" value="{{ product.get('stock', 25) if product else 25 }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Detailed Product Description *</label>
+                        <textarea name="description" rows="4" required class="form-control" placeholder="Write key specifications, materials, battery life, and features...">{{ product.get('description', '') if product else '' }}</textarea>
+                    </div>
+
+                    <!-- Product Image Upload + Built-in Preset Selector -->
+                    <div class="form-row-2" style="background:#f8fafc;padding:1.25rem;border-radius:12px;border:1px solid var(--admin-border);margin-bottom:1.25rem;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label"><i class="fa-solid fa-upload" style="color:var(--purple-600);"></i> Upload Product Image File</label>
+                            <input type="file" name="image_file" accept=".png,.jpg,.jpeg,.webp,.gif,.svg" class="form-control">
+                            <small style="color:var(--admin-muted);font-size:0.78rem;">Supports PNG, JPG, WEBP, GIF, SVG up to 8MB.</small>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Or Choose / Enter Image Path</label>
+                            <input type="text" name="image_url" id="image_url_input" class="form-control" value="{{ product.get('image_url', '/static/images/products/headphones.svg') if product else '/static/images/products/headphones.svg' }}">
+                            <div style="margin-top:0.4rem;display:flex;gap:0.35rem;flex-wrap:wrap;">
+                                {% for img in ['headphones.svg', 'smartwatch.svg', 'sneakers.svg', 'backpack.svg', 'keyboard.svg', 'camera.svg', 'jacket.svg', 'speaker.svg'] %}
+                                    <button type="button" class="badge badge-purple" style="border:none;cursor:pointer;" onclick="document.getElementById('image_url_input').value='/static/images/products/{{ img }}'">
+                                        {{ img.split('.')[0] }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Merchandising Flags -->
+                    <div style="display:flex;gap:2rem;margin-bottom:1.5rem;">
+                        <label style="display:flex;align-items:center;gap:0.5rem;font-weight:600;cursor:pointer;">
+                            <input type="checkbox" name="is_featured" value="1" {% if not is_edit or (product and product.get('is_featured')) %}checked{% endif %}>
+                            <span>Display in "Featured Products" on Home Page</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:0.5rem;font-weight:600;cursor:pointer;">
+                            <input type="checkbox" name="is_trending" value="1" {% if product and product.get('is_trending') %}checked{% endif %}>
+                            <span>Mark as "Trending Product"</span>
+                        </label>
+                    </div>
+
+                    <div style="display:flex;gap:1rem;">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            {% if is_edit %}Save Product Changes{% else %}Create &amp; Publish Product{% endif %}
+                        </button>
+                        <a href="{{ url_for('admin_products') }}" class="btn btn-outline btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

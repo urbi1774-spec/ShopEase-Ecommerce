@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Categories — ShopEase Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="admin-body">
+
+    <aside class="admin-sidebar">
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-brand">
+            <span class="brand-logo-icon" style="width:36px;height:36px;font-size:1rem;"><i class="fa-solid fa-bag-shopping"></i></span>
+            <span class="hide-tablet">ShopEase <span class="admin-brand-badge">Admin</span></span>
+        </a>
+
+        <nav class="admin-nav">
+            <span class="admin-nav-label hide-tablet">Analytics &amp; Store</span>
+            <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link">
+                <i class="fa-solid fa-gauge-high"></i> <span class="hide-tablet">Dashboard Overview</span>
+            </a>
+            <a href="{{ url_for('admin_products') }}" class="admin-nav-link">
+                <i class="fa-solid fa-boxes-stacked"></i> <span class="hide-tablet">Products</span>
+            </a>
+            <a href="{{ url_for('admin_add_product') }}" class="admin-nav-link">
+                <i class="fa-solid fa-circle-plus"></i> <span class="hide-tablet">Add New Product</span>
+            </a>
+            <a href="{{ url_for('admin_categories') }}" class="admin-nav-link active">
+                <i class="fa-solid fa-layer-group"></i> <span class="hide-tablet">Categories</span>
+            </a>
+            <a href="{{ url_for('admin_orders') }}" class="admin-nav-link">
+                <i class="fa-solid fa-receipt"></i> <span class="hide-tablet">Orders</span>
+            </a>
+            <a href="{{ url_for('admin_customers') }}" class="admin-nav-link">
+                <i class="fa-solid fa-users"></i> <span class="hide-tablet">Customers</span>
+            </a>
+
+            <span class="admin-nav-label hide-tablet" style="margin-top:1rem;">Quick Links</span>
+            <a href="{{ url_for('index') }}" class="admin-nav-link" target="_blank">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hide-tablet">View Live Storefront</span>
+            </a>
+            <a href="{{ url_for('admin_logout') }}" class="admin-nav-link" style="color:#fca5a5;">
+                <i class="fa-solid fa-right-from-bracket"></i> <span class="hide-tablet">Sign Out</span>
+            </a>
+        </nav>
+    </aside>
+
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <h1 style="font-size:1.35rem;font-weight:800;">Category Management</h1>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div style="display:none;">
+                    {% for category, message in messages %}
+                        <div class="server-toast" data-category="{{ category }}" data-message="{{ message }}"></div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="admin-content">
+            <div style="display:grid;grid-template-columns:360px 1fr;gap:1.75rem;align-items:start;">
+                <!-- Create Category Form -->
+                <div class="admin-card">
+                    <h2 style="font-size:1.1rem;font-weight:800;margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid var(--admin-border);">
+                        <i class="fa-solid fa-folder-plus" style="color:var(--purple-600);margin-right:6px;"></i>
+                        Add New Category
+                    </h2>
+
+                    <form action="{{ url_for('admin_categories') }}" method="POST">
+                        <input type="hidden" name="action" value="add">
+                        <div class="form-group">
+                            <label class="form-label">Category Name *</label>
+                            <input type="text" name="name" required class="form-control" placeholder="e.g., Gaming Peripherals">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">FontAwesome Icon Class</label>
+                            <input type="text" name="icon" class="form-control" value="fa-gamepad" placeholder="fa-headphones-simple">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" rows="3" class="form-control" placeholder="Brief summary of products in this department..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-plus"></i> Create Category
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Existing Categories Table -->
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h2 style="font-size:1.1rem;font-weight:800;">Active Store Categories ({{ categories|length }})</h2>
+                    </div>
+
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Icon &amp; Name</th>
+                                    <th>Slug</th>
+                                    <th>Products</th>
+                                    <th>Quick Update</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cat in categories %}
+                                <tr>
+                                    <td>
+                                        <div style="display:flex;align-items:center;gap:0.75rem;">
+                                            <div style="width:40px;height:40px;border-radius:10px;background:var(--purple-100);color:var(--purple-700);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">
+                                                <i class="fa-solid {{ cat['icon'] }}"></i>
+                                            </div>
+                                            <div>
+                                                <div style="font-weight:700;">{{ cat['name'] }}</div>
+                                                <div style="font-size:0.78rem;color:var(--admin-muted);">{{ cat['description'] }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><code>{{ cat['slug'] }}</code></td>
+                                    <td><span class="badge badge-purple">{{ cat['product_count'] }} items</span></td>
+                                    <td>
+                                        <form action="{{ url_for('admin_categories') }}" method="POST" style="display:flex;gap:0.4rem;">
+                                            <input type="hidden" name="action" value="edit">
+                                            <input type="hidden" name="category_id" value="{{ cat['id'] }}">
+                                            <input type="hidden" name="description" value="{{ cat['description'] }}">
+                                            <input type="text" name="name" value="{{ cat['name'] }}" class="form-control" style="padding:0.35rem 0.6rem;font-size:0.82rem;width:145px;">
+                                            <input type="text" name="icon" value="{{ cat['icon'] }}" class="form-control" style="padding:0.35rem 0.6rem;font-size:0.82rem;width:110px;">
+                                            <button type="submit" class="btn btn-outline btn-sm">Save</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form action="{{ url_for('admin_categories') }}" method="POST"
+                                              data-confirm-title="Delete Category"
+                                              data-confirm="Delete category '{{ cat['name'] }}'? (Note: Categories containing products cannot be deleted until empty.)">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="category_id" value="{{ cat['id'] }}">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="confirm-modal">
+        <div class="modal-dialog">
+            <h3 id="confirm-modal-title" style="font-size:1.25rem;font-weight:800;margin-bottom:0.5rem;">Confirm Action</h3>
+            <p id="confirm-modal-message" style="color:var(--text-secondary);font-size:0.95rem;margin-bottom:1.5rem;"></p>
+            <div style="display:flex;gap:0.75rem;justify-content:center;">
+                <button type="button" id="confirm-modal-no" class="btn btn-outline">Cancel</button>
+                <button type="button" id="confirm-modal-yes" class="btn btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+    <div id="toast-container" class="toast-container"></div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

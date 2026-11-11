@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+{% block title %}
+    {% if confirmed_order %}Order Confirmed ({{ confirmed_order['order_number'] }}) — ShopEase{% else %}Checkout — ShopEase{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if confirmed_order %}
+<!-- ORDER CONFIRMATION PAGE -->
+<section class="section">
+    <div class="container" style="max-width:860px;">
+        <div class="form-card" style="padding:2.5rem;text-align:center;">
+            <div style="width:82px;height:82px;border-radius:50%;background:var(--success-bg);color:var(--success);display:inline-flex;align-items:center;justify-content:center;font-size:2.4rem;margin-bottom:1.25rem;">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <span class="badge badge-purple" style="margin-bottom:0.5rem;">ORDER CONFIRMED</span>
+            <h1 style="font-size:2.1rem;font-weight:800;margin-bottom:0.5rem;">
+                Thank You for Your Order, {{ confirmed_order['customer_name'].split(' ')[0] }}!
+            </h1>
+            <p style="color:var(--text-secondary);max-width:540px;margin:0 auto 2rem;">
+                Your order <strong>{{ confirmed_order['order_number'] }}</strong> has been saved in our system and is now being prepared for dispatch. You will pay <strong>${{ "%.2f"|format(confirmed_order['total_amount']) }}</strong> in cash upon delivery.
+            </p>
+
+            <!-- Order Details Grid -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1rem;text-align:left;background:var(--bg-secondary);padding:1.5rem;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-bottom:2rem;">
+                <div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Order Number</div>
+                    <div style="font-weight:800;font-size:1.05rem;color:var(--purple-700);">{{ confirmed_order['order_number'] }}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Order Status</div>
+                    <div><span class="badge badge-warning">{{ confirmed_order['status'] }}</span></div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Payment Method</div>
+                    <div style="font-weight:700;"><i class="fa-solid fa-money-bill-wave" style="color:var(--success);"></i> {{ confirmed_order['payment_method'] }}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Shipping Destination</div>
+                    <div style="font-size:0.9rem;font-weight:600;">{{ confirmed_order['shipping_address'] }}, {{ confirmed_order['city'] }} {{ confirmed_order['postal_code'] }}</div>
+                </div>
+            </div>
+
+            <!-- Ordered Items Breakdown -->
+            <div style="text-align:left;margin-bottom:2rem;">
+                <h3 style="font-size:1.05rem;font-weight:800;margin-bottom:1rem;">Items in Your Order</h3>
+                <div style="border:1px solid var(--border-color);border-radius:var(--radius-md);overflow:hidden;">
+                    {% for item in confirmed_items %}
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1.25rem;border-bottom:1px solid var(--border-color);gap:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;">
+                            <img src="{{ item['product_image'] }}" alt="{{ item['product_name'] }}" style="width:52px;height:52px;object-fit:contain;background:var(--bg-secondary);border-radius:8px;padding:4px;">
+                            <div>
+                                <div style="font-weight:700;">{{ item['product_name'] }}</div>
+                                <div style="font-size:0.82rem;color:var(--text-muted);">Qty: {{ item['quantity'] }} &times; ${{ "%.2f"|format(item['unit_price']) }}</div>
+                            </div>
+                        </div>
+                        <strong style="font-size:1rem;">${{ "%.2f"|format(item['subtotal']) }}</strong>
+                    </div>
+                    {% endfor %}
+                    <div style="padding:1rem 1.25rem;background:var(--purple-50);display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-weight:700;">Total Cash on Delivery Payable</span>
+                        <strong style="font-size:1.3rem;color:var(--purple-700);">${{ "%.2f"|format(confirmed_order['total_amount']) }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+                {% if current_user_id %}
+                <a href="{{ url_for('customer_orders') }}" class="btn btn-primary btn-lg">
+                    <i class="fa-solid fa-box-open"></i> View Order History
+                </a>
+                {% endif %}
+                <a href="{{ url_for('shop') }}" class="btn btn-outline btn-lg">
+                    <i class="fa-solid fa-bag-shopping"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% else %}
+<!-- CHECKOUT FORM PAGE -->
+<section class="page-banner">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{{ url_for('index') }}">Home</a>
+            <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i>
+            <a href="{{ url_for('cart') }}">Cart</a>
+            <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i>
+            <span>Secure Checkout</span>
+        </div>
+        <h1 style="font-size:2.1rem;font-weight:800;">Complete Your Order</h1>
+    </div>
+</section>
+
+<div class="container">
+    <form action="{{ url_for('checkout') }}" method="POST" id="checkout-form">
+        <div class="cart-grid">
+            <!-- Customer & Shipping Information Form -->
+            <div class="form-card">
+                <h2 style="font-size:1.25rem;font-weight:800;margin-bottom:1.25rem;padding-bottom:0.85rem;border-bottom:1px solid var(--border-color);">
+                    <i class="fa-solid fa-truck-fast" style="color:var(--purple-600);margin-right:8px;"></i>
+                    Customer &amp; Shipping Information
+                </h2>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label class="form-label" for="customer_name">Full Name *</label>
+                        <input
+                            type="text"
+                            id="customer_name"
+                            name="customer_name"
+                            required
+                            minlength="2"
+                            class="form-control"
+                            placeholder="Sarah Jenkins"
+                            value="{{ form_data.get('customer_name') or (user['full_name'] if user else '') }}"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="customer_email">Email Address *</label>
+                        <input
+                            type="email"
+                            id="customer_email"
+                            name="customer_email"
+                            required
+                            class="form-control"
+                            placeholder="you@example.com"
+                            value="{{ form_data.get('customer_email') or (user['email'] if user else '') }}"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone">Phone Number (For Delivery Updates) *</label>
+                    <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        required
+                        minlength="7"
+                        class="form-control"
+                        placeholder="+1 (555) 234-5678"
+                        value="{{ form_data.get('phone') or (user['phone'] if user else '') }}"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="shipping_address">Street Shipping Address *</label>
+                    <input
+                        type="text"
+                        id="shipping_address"
+                        name="shipping_address"
+                        required
+                        minlength="5"
+                        class="form-control"
+                        placeholder="House / Building No, Street Name, Apartment/Suite"
+                        value="{{ form_data.get('shipping_address') or (user['address'] if user else '') }}"
+                    >
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label class="form-label" for="city">City / State *</label>
+                        <input
+                            type="text"
+                            id="city"
+                            name="city"
+                            required
+                            minlength="2"
+                            class="form-control"
+                            placeholder="San Francisco, CA"
+                            value="{{ form_data.get('city') or (user['city'] if user else '') }}"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="postal_code">Postal / ZIP Code *</label>
+                        <input
+                            type="text"
+                            id="postal_code"
+                            name="postal_code"
+                            required
+                            minlength="3"
+                            class="form-control"
+                            placeholder="94107"
+                            value="{{ form_data.get('postal_code') or (user['postal_code'] if user else '') }}"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="order_notes">Delivery Instructions (Optional)</label>
+                    <textarea
+                        id="order_notes"
+                        name="order_notes"
+                        rows="2"
+                        class="form-control"
+                        placeholder="Gate code, preferred delivery hours, or landmark..."
+                    >{{ form_data.get('order_notes', '') }}</textarea>
+                </div>
+
+                <!-- Payment Method Section -->
+                <h3 style="font-size:1.15rem;font-weight:800;margin:1.75rem 0 1rem;padding-top:1.25rem;border-top:1px solid var(--border-color);">
+                    <i class="fa-solid fa-wallet" style="color:var(--blue-600);margin-right:8px;"></i>
+                    Payment Method
+                </h3>
+
+                <label style="display:flex;align-items:flex-start;gap:1rem;padding:1.25rem;border-radius:var(--radius-md);border:2px solid var(--purple-600);background:var(--purple-50);cursor:pointer;">
+                    <input type="radio" name="payment_method" value="Cash on Delivery" checked style="margin-top:4px;accent-color:var(--purple-700);">
+                    <div>
+                        <div style="font-weight:800;font-size:1rem;color:var(--text-main);display:flex;align-items:center;gap:0.5rem;">
+                            <i class="fa-solid fa-money-bill-wave" style="color:var(--purple-700);"></i>
+                            Cash on Delivery (COD)
+                            <span class="badge badge-purple">Recommended</span>
+                        </div>
+                        <p style="font-size:0.86rem;color:var(--text-secondary);margin-top:0.25rem;">
+                            Pay in cash directly to our courier partner when you receive and inspect your package at your doorstep. No online card details required.
+                        </p>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Right Column: Order Summary -->
+            <aside class="summary-card">
+                <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:1rem;padding-bottom:0.85rem;border-bottom:1px solid var(--border-color);">
+                    Order Summary ({{ cart['total_qty'] }} items)
+                </h3>
+
+                <div style="max-height:280px;overflow-y:auto;margin-bottom:1rem;padding-right:4px;">
+                    {% for item in cart['items'] %}
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding:0.65rem 0;border-bottom:1px solid var(--border-color);">
+                        <div style="display:flex;align-items:center;gap:0.75rem;">
+                            <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}" style="width:46px;height:46px;object-fit:contain;background:var(--bg-secondary);border-radius:8px;padding:4px;">
+                            <div>
+                                <div style="font-size:0.88rem;font-weight:700;line-height:1.25;">{{ item['name'] }}</div>
+                                <div style="font-size:0.78rem;color:var(--text-muted);">Qty: {{ item['quantity'] }} &times; ${{ "%.2f"|format(item['unit_price']) }}</div>
+                            </div>
+                        </div>
+                        <strong style="font-size:0.9rem;">${{ "%.2f"|format(item['line_total']) }}</strong>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <strong>${{ "%.2f"|format(cart['subtotal']) }}</strong>
+                </div>
+                {% if cart['discount_savings'] > 0 %}
+                <div class="summary-row" style="color:var(--success);">
+                    <span>Promotional Savings</span>
+                    <strong>-${{ "%.2f"|format(cart['discount_savings']) }}</strong>
+                </div>
+                {% endif %}
+                <div class="summary-row">
+                    <span>Shipping Fee</span>
+                    <strong>
+                        {% if cart['shipping_fee'] == 0 %}
+                            <span style="color:var(--success);">FREE</span>
+                        {% else %}
+                            ${{ "%.2f"|format(cart['shipping_fee']) }}
+                        {% endif %}
+                    </strong>
+                </div>
+                <div class="summary-row total">
+                    <span>Total Payable (COD)</span>
+                    <span style="color:var(--purple-700);">${{ "%.2f"|format(cart['total_amount']) }}</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-block" style="margin-top:1.5rem;">
+                    <i class="fa-solid fa-check-double"></i> Place Order Now
+                </button>
+
+                <a href="{{ url_for('cart') }}" class="btn btn-outline btn-sm btn-block" style="margin-top:0.75rem;">
+                    <i class="fa-solid fa-arrow-left"></i> Edit Cart
+                </a>
+            </aside>
+        </div>
+    </form>
+</div>
+{% endif %}
+{% endblock %}

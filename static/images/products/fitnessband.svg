@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg11" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5f3ff"/>
+      <stop offset="100%" stop-color="#e0e7ff"/>
+    </linearGradient>
+    <linearGradient id="clasp11" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6d28d9"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <filter id="shadow11" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#1e1b4b" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="600" height="600" rx="32" fill="url(#bg11)"/>
+  <g filter="url(#shadow11)">
+    <!-- Knit Band Ring -->
+    <ellipse cx="300" cy="305" rx="165" ry="125" fill="none" stroke="#1e293b" stroke-width="46"/>
+    <ellipse cx="300" cy="305" rx="165" ry="125" fill="none" stroke="#334155" stroke-width="32" stroke-dasharray="14 8"/>
+    <!-- Sensor Clasp Top -->
+    <rect x="215" y="152" width="170" height="58" rx="22" fill="#0f172a" stroke="url(#clasp11)" stroke-width="5"/>
+    <!-- Pulse Wave Line -->
+    <polyline points="240,181 275,181 288,163 302,198 315,172 325,181 360,181" fill="none" stroke="#a78bfa" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="300" y="545" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="700" fill="#4338ca" text-anchor="middle" letter-spacing="2">AEROBAND PRO TRACKER</text>
+</svg>
